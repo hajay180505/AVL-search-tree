@@ -5,45 +5,42 @@
 
 using namespace std;
 //node functions
-int node::height(){
+template <typename T>
+int node<T>::height(){
         if(!this) return 0;
         return 1+ max(this->left->height() , this->right->height());
 }
 
-int node::balanceFactor(){
+template <typename T>
+int node<T>::balanceFactor(){
         return ( (this->left->height()) - (this->right->height()) );
 }
 
 //avl functions
-avl::avl(){
+template <typename T>
+avl<T>::avl(){
         cout<<"CALL insertRoot!!";
+        count = 0;
 }
 
-avl::avl(int elt){
-        node* n = new node;
-        if(!n) { cout<<"No memory allocted!"<<endl; return;}
-        n->data = elt;
-        n->left = nullptr;
-        n->right = nullptr;
-        n->parent = nullptr;
+template <typename T>
+avl<T>::avl(T elt){
+        node<T>* n = createNode(elt);
         root = n;
-        count++;
+        count=1;
 }
 
-void avl::insertRoot(int elt){
-        node* n = new node;
-        if(!n) { cout<<"No memory allocted!"<<endl; return;}
-        n->data = elt;
-        n->left = nullptr;
-        n->right = nullptr;
-        n->parent = nullptr;
+template <typename T>
+void avl<T>::insertRoot(T elt){
+        node<T>* n = createNode(elt);
         root = n;
         count++;
 
 }
 
-node* avl::createNode(int elt){
-        node* n = new node;
+template <typename T>
+node<T>* avl<T>::createNode(T elt){
+        node<T>* n = new node<T>;
         if(!n) {
                 cout<<"No memory allocted!"<<endl;
                 return nullptr;
@@ -55,10 +52,11 @@ node* avl::createNode(int elt){
         return n;
 }
 
-void avl::insert(int elt){
-        vector<node*> path;
+template <typename T>
+void avl<T>::insert(T elt){
+        vector<node<T>*> path;
         ptr = root;
-        node* prev = ptr;
+        node<T>* prev = ptr;
         while(ptr){
                 path.push_back(ptr);
                 if(elt > ptr->data){
@@ -79,12 +77,13 @@ void avl::insert(int elt){
                 prev->left->parent = prev;
         }
 
-        node* n = checkImbalance(path);
+        node<T>* n = checkImbalance(path);
         if(n) balance(n);
 }
 
-node* avl::checkImbalance(const vector<node*>& path){
-        node* A = nullptr;
+template <typename T>
+node<T>* avl<T>::checkImbalance(const vector<node<T>*>& path){
+        node<T>* A = nullptr;
         for(auto it=path.rbegin() ; it!=path.rend() ;  it++){
                 int bf = (*it)->balanceFactor();
                 if(bf<-1 or bf>1){
@@ -95,10 +94,11 @@ node* avl::checkImbalance(const vector<node*>& path){
         return A;
 }
 
-void avl::balance(node* A){
+template <typename T>
+void avl<T>::balance(node<T>* A){
         if(!A) return;
-        node* p = A->parent;
-        node* u = nullptr;
+        node<T>* p = A->parent;
+        node<T>* u = nullptr;
         if(A->balanceFactor()==-2){
                 //R type
                 int currBf = A->right->balanceFactor();
@@ -130,8 +130,9 @@ void avl::balance(node* A){
         }
 }
 
-void avl::remove(int elt){
-        vector<node*> path;
+template <typename T>
+void avl<T>::remove(T elt){
+        vector<node<T>*> path;
         ptr = root;
         while(ptr){
                 path.push_back(ptr);
@@ -143,7 +144,7 @@ void avl::remove(int elt){
                 cout<<"Element not found! So, not deleted."<<endl;
                 return;
         }
-        node* p = ptr->parent;
+        node<T>* p = ptr->parent;
         if(!ptr->left and !ptr->right){
                 if(p){
                         path.pop_back();
@@ -152,7 +153,7 @@ void avl::remove(int elt){
                         else
                                 p->right = nullptr;
                         delete ptr;
-                        node* u  = checkImbalance(path);
+                        node<T>* u  = checkImbalance(path);
                         if(u) balance(u);
                 }
         }
@@ -170,7 +171,7 @@ void avl::remove(int elt){
                         root->parent = nullptr;
                 }
                 delete ptr;
-                node* u  = checkImbalance(path);
+                node<T>* u  = checkImbalance(path);
                 if(u) balance(u);
         }
         else if(!ptr->right){
@@ -187,12 +188,12 @@ void avl::remove(int elt){
                         root->parent = nullptr;
                 }
                 delete ptr;
-                node* u  = checkImbalance(path);
+                node<T>* u  = checkImbalance(path);
                 if(u) balance(u);
 
         }
         else{
-                node* s = inorder_successor(ptr);
+                node<T>* s = inorder_successor(ptr);
                 if(ptr->right == s){
                         ptr->right = s->right;
                         if(s->right) s->right->parent = ptr;
@@ -205,7 +206,7 @@ void avl::remove(int elt){
                 }
                 delete s;
                 path.pop_back();
-                node* u = checkImbalance(path);
+                node<T>* u = checkImbalance(path);
                 if(u) balance(u);
         }
 
@@ -214,9 +215,9 @@ void avl::remove(int elt){
 
 //rotations
 
-
-node* avl::LL(node* A){
-        node* k = new node;
+template <typename T>
+node<T>* avl<T>::LL(node<T>* A){
+        node<T>* k = new node<T>;
         k = A->left;
         A->left = k->right;
         if(A->left) A->left->parent = A;
@@ -225,20 +226,23 @@ node* avl::LL(node* A){
         return k;
 }
 
-node* avl::LR(node* A){
+template <typename T>
+node<T>* avl<T>::LR(node<T>* A){
         A->left = RR(A->left);
         if(A->left) A->left->parent = A;
         return LL(A);
 }
 
-node* avl::RL(node* A){
+template <typename T>
+node<T>* avl<T>::RL(node<T>* A){
         A->right = LL(A->right);
         if(A->right) A->right->parent = A;
         return RR(A);
 }
 
-node* avl::RR(node* A){
-        node* k = new node;
+template <typename T>
+node<T>* avl<T>::RR(node<T>* A){
+        node<T>* k = new node<T>;
         k = A->right;
         A->right = k->left;
         if(A->right) A->right->parent = A;
@@ -249,7 +253,8 @@ node* avl::RR(node* A){
 }
 
 //non-member functions
-void inorder(node* ptr){
+template <typename T>
+void inorder(node<T>* ptr){
         if(ptr){
                 inorder(ptr->left);
                 cout<<ptr->data<<" ";
@@ -257,7 +262,8 @@ void inorder(node* ptr){
         }
 }
 
-void preorder(node* ptr){
+template <typename T>
+void preorder(node<T>* ptr){
         if(ptr){
                 cout<<ptr->data<<" ";
                 preorder(ptr->left);
@@ -265,7 +271,8 @@ void preorder(node* ptr){
         }
 }
 
-void postorder(node* ptr){
+template <typename T>
+void postorder(node<T>* ptr){
         if(ptr){
                 preorder(ptr->left);
                 preorder(ptr->right);
@@ -273,12 +280,13 @@ void postorder(node* ptr){
         }
 }
 
-vector<node*> levelorder(node* rt){
-        vector<node*> ans;
-        queue<node*> q;
+template <typename T>
+vector<node<T>*> levelorder(node<T>* rt){
+        vector<node<T>*> ans;
+        queue<node<T>*> q;
         q.push(rt);
         while(!q.empty()){
-                node* curr = q.front();
+                node<T>* curr = q.front();
                 cout<<curr->data<<endl;
                 ans.push_back(curr);
                 q.pop();
@@ -288,7 +296,8 @@ vector<node*> levelorder(node* rt){
         return ans;
 }
 
-void print(const string& prefix, node* node, bool isLeft){
+template <typename T>
+void print(const string& prefix, node<T>* node, bool isLeft){
     if(node){
         cout << prefix;
         cout << (isLeft ? "├──" : "└──" );
@@ -298,11 +307,13 @@ void print(const string& prefix, node* node, bool isLeft){
     }
 }
 
-void print(node* n){
+template <typename T>
+void print(node<T>* n){
     print("", n, false);
 }
 
-node* inorder_successor(node* u){
+template <typename T>
+node<T>* inorder_successor(node<T>* u){
         if(!u) return nullptr;
         if(u->right){
                 u = u->right;

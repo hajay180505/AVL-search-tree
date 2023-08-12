@@ -1,42 +1,47 @@
+#pragma once
 #include <vector>
 #include <string>
-
+template <typename T>
 struct node{
-        int data;
+        T data;
         node* left, * right, *parent;
         int height();
         int balanceFactor();
 };
 
-
+template <typename T>
 class avl{
         public:
-                node* ptr;
-                node* root;
+                node<T>* ptr;
+                node<T>* root;
                 int count;
 
                 avl();
-                avl(int elt);
-                node* createNode(int);
-                void insertRoot(int elt);
-                void insert(int elt);
-                node* checkImbalance(const std::vector<node*>&);
-                void balance(node*);
-                void remove(int elt);
+                avl(T elt);
+                node<T>* createNode(T);
+                void insertRoot(T elt);
+                void insert(T elt);
+                node<T>* checkImbalance(const std::vector<node<T>*>&);
+                void balance(node<T>*);
+                void remove(T elt);
 
-                node* LL(node*);
-                node* LR(node*);
-                node* RL(node*);
-                node* RR(node*);
+                node<T>* LL(node<T>*);
+                node<T>* LR(node<T>*);
+                node<T>* RL(node<T>*);
+                node<T>* RR(node<T>*);
 };
-
-void inorder(node*);
-void preorder(node*);
-void postorder(node*);
-std::vector<node*> levelorder(node*);
-
-void print(const std::string& prefix, node* node, bool isLeft);
-void print(node* );
-
-node* inorder_successor(node*);
+template <typename T>
+void inorder(node<T>*);
+template <typename T>
+void preorder(node<T>*);
+template <typename T>
+void postorder(node<T>*);
+template <typename T>
+std::vector<node<T>*> levelorder(node<T>*);
+template <typename T>
+void print(const std::string& prefix, node<T>* node, bool isLeft);
+template <typename T>
+void print(node<T>* );
+template <typename T>
+node<T>* inorder_successor(node<T>*);
 
